@@ -8,9 +8,9 @@ html, body {
 
 /* ===== BASE STYLE ===== */
 body {
-  background-color: black;
+  background: #0b0b0b;
   color: white;
-  font-family: sans-serif;
+  font-family: ui-sans-serif, system-ui;
 }
 
 /* ===== SCROLLBAR (gaming feel 🔥) ===== */
@@ -41,4 +41,19 @@ body {
 
 .animate-soft-pulse {
   animation: softPulse 1s infinite;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+:root {
+  --header-height: 110px;
+}
+
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }

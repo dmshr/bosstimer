@@ -1,38 +1,86 @@
 "use client";
 
-import { useState } from "react";
-import { updateBoss } from "@/services/bossServices";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 
-export default function BossModal({ boss, onClose, setBosses }) {
+export default function BossModal({ boss, onClose }) {
   const [killedInput, setKilledInput] = useState("");
 
+  useEffect(() => {
+    if (boss) {
+      setKilledInput(boss.killed || "");
+    }
+  }, [boss]);
+
   function handleSave() {
+    console.log("SAVE:", killedInput);
+    onClose();
+  }
+
+  function handleJustNow() {
     const now = new Date().toISOString();
-
-    setBosses(prev =>
-      prev.map(b =>
-        b.name === boss.name ? { ...b, killed: now } : b
-      )
-    );
-
-    updateBoss({ ...boss, killed: now }); // API call
+    console.log("JUST NOW:", now);
     onClose();
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-      <div className="bg-black p-5 rounded-xl">
-        <h2>{boss.name}</h2>
+    <AnimatePresence>
+      {boss && (
+        <motion.div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="bg-[#0b0b0b] w-[320px] rounded-2xl p-6 relative"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+          >
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 text-gray-400 hover:text-red-400"
+            >
+              ✕
+            </button>
 
-        <input
-          value={killedInput}
-          onChange={(e) => setKilledInput(e.target.value)}
-          className="border p-2"
-        />
+            <div className="text-center text-lg font-semibold mb-4">
+              {boss.name}
+            </div>
 
-        <button onClick={handleSave}>Save</button>
-        <button onClick={onClose}>Close</button>
-      </div>
-    </div>
+            <div className="text-center text-sm text-gray-400 mb-2">
+              Time Killed
+            </div>
+
+            <input
+              value={killedInput}
+              onChange={(e) => setKilledInput(e.target.value)}
+              className="w-full bg-black border border-gray-700 rounded-lg px-3 py-2 text-sm mb-4"
+            />
+
+            <button
+              onClick={handleSave}
+              className="w-full bg-red-700 hover:bg-red-600 py-2 rounded-lg mb-4"
+            >
+              Save
+            </button>
+
+            <div className="h-0.5 bg-linear-to-r from-transparent via-red-500 to-transparent mb-4" />
+
+            <div className="flex gap-3">
+              <button className="flex-1 bg-gray-800 py-2 rounded-lg text-sm">
+                Not Spawn
+              </button>
+              <button
+                onClick={handleJustNow}
+                className="flex-1 bg-green-700 py-2 rounded-lg text-sm"
+              >
+                Just Now
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
