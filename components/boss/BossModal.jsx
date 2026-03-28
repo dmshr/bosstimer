@@ -2,8 +2,9 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { updateBoss } from "@/services/bossServices";
 
-export default function BossModal({ boss, onClose }) {
+export default function BossModal({ boss, onClose, onSaved }) {
   const [killedInput, setKilledInput] = useState("");
 
   useEffect(() => {
@@ -12,14 +13,31 @@ export default function BossModal({ boss, onClose }) {
     }
   }, [boss]);
 
-  function handleSave() {
-    console.log("SAVE:", killedInput);
+  async function handleSave() {
+    if (!boss) return;
+
+    await updateBoss({
+      name: boss.name,
+      spawn: boss.spawn,
+      killed: killedInput,
+    });
+
+    await onSaved();
     onClose();
   }
 
-  function handleJustNow() {
+  async function handleJustNow() {
+    if (!boss) return;
+
     const now = new Date().toISOString();
-    console.log("JUST NOW:", now);
+
+    await updateBoss({
+      name: boss.name,
+      spawn: boss.spawn,
+      killed: now,
+    });
+
+    await onSaved();
     onClose();
   }
 

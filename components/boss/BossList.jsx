@@ -1,25 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import BossRow from "@/components/boss/BossRow.jsx";
 import BossModal from "@/components/boss/BossModal.jsx";
-import { initialBosses } from "@/data/bossData.js";
+import { fetchBosses } from "@/services/bossServices";
+
+function sortBySpawn(bosses) {
+  return [...bosses].sort((a, b) => {
+    if (!a.spawn) return 1;
+    if (!b.spawn) return -1;
+    return a.spawn.localeCompare(b.spawn);
+  });
+}
 
 export default function BossList() {
+  const [bosses, setBosses] = useState([]);
   const [selectedBoss, setSelectedBoss] = useState(null);
 
-  const sortedBosses = [...initialBosses];
+  const loadBosses = useCallback(async () => {
+    const data = await fetchBosses();
+    setBosses(sortBySpawn(data));
+  }, []);
+
+  useEffect(() => {
+    loadBosses();
+  }, [loadBosses]);
 
   return (
     <div className="w-full bg-[#0f0f0f] rounded-2xl mt-4 overflow-hidden">
-      
-      {/* CONTENT */}
       <div className="w-full">
         <AnimatePresence>
-          {sortedBosses.map((boss) => (
+          {bosses.map((boss) => (
             <BossRow
-              key={boss.name}
+              key={boss.id}
               boss={boss}
               onSelect={setSelectedBoss}
             />
@@ -27,10 +41,10 @@ export default function BossList() {
         </AnimatePresence>
       </div>
 
-      {/* MODAL */}
       <BossModal
         boss={selectedBoss}
         onClose={() => setSelectedBoss(null)}
+        onSaved={loadBosses}
       />
     </div>
   );

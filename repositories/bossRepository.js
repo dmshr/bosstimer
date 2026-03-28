@@ -1,9 +1,20 @@
-import prisma from "@/lib/prisma"; // kalau pakai prisma
+import prisma from "@/lib/prisma";
+
+export async function getAllBosses() {
+  return prisma.boss.findMany();
+}
 
 export async function saveBoss(data) {
   return prisma.boss.upsert({
     where: { name: data.name },
-    update: data,
-    create: data
+    update: {
+      spawn: data.spawn,
+      killed: data.killed,
+    },
+    create: {
+      name: data.name,
+      spawn: data.spawn,
+      killed: data.killed,
+    },
   });
 }
