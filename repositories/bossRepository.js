@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getAllBosses() {
-  return prisma.boss.findMany();
+  return await prisma.boss.findMany();
 }
 
 export async function saveBoss(data) {
-  return prisma.boss.upsert({
+  return await prisma.boss.upsert({
     where: { name: data.name },
     update: {
       spawn: data.spawn,
